@@ -1,11 +1,12 @@
 """
-ToDos REST API
+ToDos REST API with HATEOAS (HAL-style)
 
-From the LinkedIn Learning course "Programming Foundations: APIs and Web Services" (Kesha Williams, 2025)
-https://www.linkedin.com/learning/programming-foundations-apis-and-web-services-27993033
+Based on:
+"Programming Foundations: APIs and Web Services"
+Kesha Williams (LinkedIn Learning, 2025)
 """
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, url_for
 
 app = Flask(__name__)
 
@@ -17,24 +18,53 @@ todos = [
     {"id": 4, "task": "Watch another course from Kesha", "done": False}
 ]
 
-# Helper function to find a to-do item by ID
 def find_todo(todo_id):
     return next((todo for todo in todos if todo["id"] == todo_id), None)
 
-# Get all to-do items
+# -----------------------------
+# HATEOAS helper
+# -----------------------------
+def add_todo_links(todo):
+    """Return a HAL-style representation of one todo."""
+    return {
+        **todo,
+        "_links": {
+            "self": {"href": url_for("get_todo", todo_id=todo["id"], _external=True)},
+            "update": {"href": url_for("update_todo", todo_id=todo["id"], _external=True)},
+            "delete": {"href": url_for("delete_todo", todo_id=todo["id"], _external=True)},
+            "collection": {"href": url_for("get_todos", _external=True)}
+        }
+    }
+
+def add_collection_links(items):
+    """Return a HAL-style list with navigation links."""
+    return {
+        "_links": {
+            "self": {"href": url_for("get_todos", _external=True)},
+            "create": {"href": url_for("create_todo", _external=True)},
+        },
+        "_embedded": {
+            "todos": [add_todo_links(t) for t in items]
+        }
+    }
+
+# -----------------------------
+# Routes
+# -----------------------------
+
 @app.route('/todos', methods=['GET'])
 def get_todos():
-    return jsonify(todos), 200
+    return jsonify(add_collection_links(todos)), 200
 
-# Get a specific to-do item by ID
+
 @app.route('/todos/<int:todo_id>', methods=['GET'])
 def get_todo(todo_id):
     todo = find_todo(todo_id)
-    if todo:
-        return jsonify(todo), 200
-    return jsonify({"error": "To-do item not found"}), 404
+    if not todo:
+        return jsonify({"error": "To-do item not found"}), 404
+    return jsonify(add_todo_links(todo)), 200
 
-# Create a new to-do item
+
 @app.route('/todos', methods=['POST'])
 def create_todo():
     data = request.json
@@ -42,14 +72,18 @@ def create_todo():
         return jsonify({"error": "Task description is required"}), 400
 
     new_todo = {
-        "id": max(todo["id"] for todo in todos) + 1 if todos else 1,  # Auto-increment ID
+        "id": max(todo["id"] for todo in todos) + 1 if todos else 1,
         "task": data["task"],
-        "done": data.get("done", False)  # Default done status is False
+        "done": data.get("done", False)
     }
     todos.append(new_todo)
-    return jsonify({"message": "To-do item created", "todo": new_todo}), 201
 
-# Update an existing to-do item
+    return jsonify({
+        "message": "To-do item created",
+        "todo": add_todo_links(new_todo)
+    }), 201
+
+
 @app.route('/todos/<int:todo_id>', methods=['PUT'])
 def update_todo(todo_id):
     todo = find_todo(todo_id)
@@ -60,15 +94,24 @@ def update_todo(todo_id):
     todo["task"] = data.get("task", todo["task"])
     todo["done"] = data.get("done", todo["done"])
 
-    return jsonify({"message": "To-do item updated", "todo": todo}), 200
+    return jsonify({
+        "message": "To-do item updated",
+        "todo": add_todo_links(todo)
+    }), 200
 
-# Delete a to-do item
+
 @app.route('/todos/<int:todo_id>', methods=['DELETE'])
 def delete_todo(todo_id):
     global todos
     todos = [todo for todo in todos if todo["id"] != todo_id]
+    
+    return jsonify({
+        "message": f"To-do item with ID {todo_id} deleted",
+        "_links": {
+            "collection": {"href": url_for("get_todos", _external=True)}
+        }
+    }), 200
 
-    return jsonify({"message": f"To-do item with ID {todo_id} deleted"}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
