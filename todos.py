@@ -112,6 +112,15 @@ def delete_todo(todo_id):
         }
     }), 200
 
+# -----------------------------
+# Header versioning
+# -----------------------------
+@app.after_request
+def add_custom_headers(response):
+    response.headers['Content-Type'] = 'application/json'
+    response.headers['X-API-Version'] = '1'
+
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
