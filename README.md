@@ -2,8 +2,8 @@
 REST API example about a to-do list.
 
 ## Installation
-- Start the API: `docker-compose up -d --build`
-- Stop the API: `docker-compose down`
+- Start the API: `docker compose up -d --build`. It will run on `http://localhost:5000`
+- Stop the API: `docker compose down`
 
 ## Endpoints
 
