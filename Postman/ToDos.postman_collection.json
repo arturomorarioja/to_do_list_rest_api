@@ -1,121 +1,147 @@
 {
-	"info": {
-		"_postman_id": "80547fe6-853c-44f5-83e2-fcdee1097eae",
-		"name": "ToDos",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "11087769"
-	},
-	"item": [
-		{
-			"name": "GET",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{BASE_URL}}/todos",
-					"host": [
-						"{{BASE_URL}}"
-					],
-					"path": [
-						"todos"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "POST",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"task\": \"Study System Integration\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{BASE_URL}}/todos",
-					"host": [
-						"{{BASE_URL}}"
-					],
-					"path": [
-						"todos"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET/:id",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{BASE_URL}}/todos/5",
-					"host": [
-						"{{BASE_URL}}"
-					],
-					"path": [
-						"todos",
-						"5"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "PUT",
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"task\": \"Study more System Integration\"\r\n}"
-				},
-				"url": {
-					"raw": "{{BASE_URL}}/todos/5",
-					"host": [
-						"{{BASE_URL}}"
-					],
-					"path": [
-						"todos",
-						"5"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DELETE",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"task\": \"Study System Integration\"\r\n}"
-				},
-				"url": {
-					"raw": "{{BASE_URL}}/todos/5",
-					"host": [
-						"{{BASE_URL}}"
-					],
-					"path": [
-						"todos",
-						"5"
-					]
-				}
-			},
-			"response": []
-		}
-	]
+  "info": {
+    "_postman_id": "80547fe6-853c-44f5-83e2-fcdee1097eae",
+    "name": "ToDos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "11087769"
+  },
+  "item": [
+    {
+      "name": "GET",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/todos",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "todos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Store the new todo ID\", function () {\r\n    var jsonData = pm.response.json();\r\n    pm.collectionVariables.set(\"TODO_ID\", jsonData.todo.id);\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"task\": \"Study System Integration\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/todos",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "todos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET/:id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/todos/{{TODO_ID}}",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "todos",
+            "{{TODO_ID}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"task\": \"Study more System Integration\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/todos/{{TODO_ID}}",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "todos",
+            "{{TODO_ID}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/todos/{{TODO_ID}}",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "todos",
+            "{{TODO_ID}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "TODO_ID",
+      "value": ""
+    }
+  ]
 }
